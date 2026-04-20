@@ -5,11 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Todo Uygulaması</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -30,19 +26,100 @@
       height: fit-content;
     }
 
-    h1 {
-      font-size: 24px;
-      color: #e74c3c;
-      margin-bottom: 24px;
+    h1 { font-size: 24px; color: #e74c3c; margin-bottom: 8px; text-align: center; }
+
+    .subtitle {
       text-align: center;
-    }
-
-    .input-row {
-      display: flex;
-      gap: 8px;
+      font-size: 13px;
+      color: #999;
       margin-bottom: 24px;
     }
 
+    /* ---- AUTH ---- */
+    #auth-section { display: block; }
+    #app-section  { display: none; }
+
+    .auth-tabs {
+      display: flex;
+      border-bottom: 2px solid #f0f0f0;
+      margin-bottom: 20px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      background: none;
+      border: none;
+      font-size: 15px;
+      cursor: pointer;
+      color: #999;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+
+    .auth-tab.active {
+      color: #6c63ff;
+      border-bottom-color: #6c63ff;
+      font-weight: 600;
+    }
+
+    .auth-form { display: flex; flex-direction: column; gap: 12px; }
+    .auth-form input {
+      padding: 10px 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .auth-form input:focus { border-color: #6c63ff; }
+
+    .btn-primary {
+      padding: 11px;
+      background: #6c63ff;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: #574fd6; }
+    .btn-primary:disabled { background: #bbb; cursor: not-allowed; }
+
+    .msg {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+    }
+    .msg.error   { background: #fdecea; color: #c0392b; display: block; }
+    .msg.success { background: #eafaf1; color: #1e8449; display: block; }
+
+    /* ---- APP ---- */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .user-info { font-size: 13px; color: #999; }
+
+    .signout-btn {
+      background: none;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 13px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .signout-btn:hover { border-color: #e74c3c; color: #e74c3c; }
+
+    .input-row { display: flex; gap: 8px; margin-bottom: 20px; }
     .input-row input {
       flex: 1;
       padding: 10px 14px;
@@ -52,11 +129,7 @@
       outline: none;
       transition: border-color 0.2s;
     }
-
-    .input-row input:focus {
-      border-color: #6c63ff;
-    }
-
+    .input-row input:focus { border-color: #6c63ff; }
     .input-row button {
       padding: 10px 18px;
       background: #6c63ff;
@@ -68,17 +141,9 @@
       transition: background 0.2s;
       white-space: nowrap;
     }
+    .input-row button:hover { background: #574fd6; }
 
-    .input-row button:hover {
-      background: #574fd6;
-    }
-
-    .filters {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
+    .filters { display: flex; gap: 8px; margin-bottom: 16px; }
     .filters button {
       flex: 1;
       padding: 6px;
@@ -89,148 +154,113 @@
       cursor: pointer;
       transition: all 0.2s;
     }
+    .filters button.active { border-color: #6c63ff; color: #6c63ff; font-weight: 600; }
 
-    .filters button.active {
-      border-color: #6c63ff;
-      color: #6c63ff;
-      font-weight: 600;
-    }
-
-    #todo-list {
-      list-style: none;
-    }
-
+    #todo-list { list-style: none; }
     #todo-list li {
       display: flex;
       align-items: center;
       gap: 12px;
       padding: 12px 10px;
       border-bottom: 1px solid #f0f0f0;
-      transition: opacity 0.2s;
     }
-
-    #todo-list li:last-child {
-      border-bottom: none;
-    }
-
-    #todo-list li.done .todo-text {
-      text-decoration: line-through;
-      color: #aaa;
-    }
+    #todo-list li:last-child { border-bottom: none; }
+    #todo-list li.done .todo-text { text-decoration: line-through; color: #aaa; }
 
     #todo-list li input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
+      width: 18px; height: 18px;
       accent-color: #6c63ff;
-      cursor: pointer;
-      flex-shrink: 0;
+      cursor: pointer; flex-shrink: 0;
     }
 
-    .todo-text {
-      flex: 1;
-      font-size: 15px;
-      color: #333;
-      word-break: break-word;
-    }
+    .todo-text { flex: 1; font-size: 15px; color: #333; word-break: break-word; }
 
     .edit-btn, .delete-btn {
-      background: none;
-      border: none;
-      font-size: 16px;
-      cursor: pointer;
-      padding: 0 4px;
-      line-height: 1;
-      transition: color 0.2s;
-      flex-shrink: 0;
+      background: none; border: none;
+      font-size: 16px; cursor: pointer;
+      padding: 0 4px; line-height: 1;
+      transition: color 0.2s; flex-shrink: 0;
     }
-
-    .edit-btn {
-      color: #ccc;
-    }
-
-    .edit-btn:hover {
-      color: #6c63ff;
-    }
-
-    .delete-btn {
-      color: #ccc;
-      font-size: 18px;
-    }
-
-    .delete-btn:hover {
-      color: #e74c3c;
-    }
+    .edit-btn { color: #ccc; }
+    .edit-btn:hover { color: #6c63ff; }
+    .delete-btn { color: #ccc; font-size: 18px; }
+    .delete-btn:hover { color: #e74c3c; }
 
     .edit-input {
-      flex: 1;
-      padding: 4px 8px;
+      flex: 1; padding: 4px 8px;
       border: 2px solid #6c63ff;
-      border-radius: 6px;
-      font-size: 15px;
-      outline: none;
+      border-radius: 6px; font-size: 15px; outline: none;
     }
-
     .save-btn {
-      background: #6c63ff;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 13px;
-      cursor: pointer;
-      flex-shrink: 0;
+      background: #6c63ff; color: #fff; border: none;
+      border-radius: 6px; padding: 4px 10px;
+      font-size: 13px; cursor: pointer; flex-shrink: 0;
     }
-
-    .save-btn:hover {
-      background: #574fd6;
-    }
-
+    .save-btn:hover { background: #574fd6; }
     .cancel-btn {
-      background: none;
-      border: none;
-      color: #aaa;
-      font-size: 18px;
-      cursor: pointer;
-      padding: 0 4px;
-      flex-shrink: 0;
+      background: none; border: none; color: #aaa;
+      font-size: 18px; cursor: pointer; padding: 0 4px; flex-shrink: 0;
     }
-
-    .cancel-btn:hover {
-      color: #333;
-    }
+    .cancel-btn:hover { color: #333; }
 
     .footer {
       margin-top: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 13px;
-      color: #999;
+      font-size: 13px; color: #999;
     }
-
     .footer button {
-      background: none;
-      border: none;
-      color: #e74c3c;
-      font-size: 13px;
-      cursor: pointer;
+      background: none; border: none;
+      color: #e74c3c; font-size: 13px; cursor: pointer;
     }
+    .footer button:hover { text-decoration: underline; }
 
-    .footer button:hover {
-      text-decoration: underline;
-    }
+    .empty { text-align: center; color: #bbb; padding: 32px 0; font-size: 14px; }
 
-    .empty {
+    /* confirmation screen */
+    #confirm-section {
+      display: none;
       text-align: center;
-      color: #bbb;
-      padding: 32px 0;
-      font-size: 14px;
+      padding: 16px 0;
     }
+    #confirm-section p { color: #555; font-size: 15px; line-height: 1.6; }
+    #confirm-section .big { font-size: 40px; margin-bottom: 12px; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Yapılacaklar</h1>
+<div class="container">
+  <h1>Yapılacaklar</h1>
+
+  <!-- EMAIL CONFIRMATION SUCCESS SCREEN -->
+  <div id="confirm-section">
+    <div class="big">✅</div>
+    <p>E-posta adresiniz doğrulandı.<br>Giriş yapılıyor...</p>
+  </div>
+
+  <!-- AUTH SECTION -->
+  <div id="auth-section">
+    <p class="subtitle">Devam etmek için giriş yapın</p>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Giriş Yap</button>
+      <button class="auth-tab" onclick="switchTab('register')">Kayıt Ol</button>
+    </div>
+
+    <div class="auth-form">
+      <input type="email" id="auth-email" placeholder="E-posta" autocomplete="email">
+      <input type="password" id="auth-password" placeholder="Şifre (min. 6 karakter)" autocomplete="current-password">
+      <div id="auth-msg" class="msg"></div>
+      <button class="btn-primary" id="auth-btn" onclick="handleAuth()">Giriş Yap</button>
+    </div>
+  </div>
+
+  <!-- APP SECTION -->
+  <div id="app-section">
+    <div class="app-header">
+      <span class="user-info" id="user-email-label"></span>
+      <button class="signout-btn" onclick="signOut()">Çıkış Yap</button>
+    </div>
+
     <div class="input-row">
       <input type="text" id="todo-input" placeholder="Yeni görev ekle..." maxlength="200">
       <button onclick="addTodo()">Ekle</button>
@@ -246,142 +276,326 @@
       <button onclick="clearDone()">Tamamlananları sil</button>
     </div>
   </div>
+</div>
 
-  <script>
-    const SUPABASE_URL = 'https://jswhjwegbvefaukbfdnn.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impzd2hqd2VnYnZlZmF1a2JmZG5uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MDkxMTgsImV4cCI6MjA5MjI4NTExOH0.JK_h5KdqLM_CnZXig7pcJswK1rO_SMtS72xw3eF09tI';
-    const API = `${SUPABASE_URL}/rest/v1/todos`;
-    const HEADERS = {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
+<script>
+  const SUPABASE_URL = 'https://jswhjwegbvefaukbfdnn.supabase.co';
+  const ANON_KEY    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impzd2hqd2VnYnZlZmF1a2JmZG5uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MDkxMTgsImV4cCI6MjA5MjI4NTExOH0.JK_h5KdqLM_CnZXig7pcJswK1rO_SMtS72xw3eF09tI';
+  const AUTH_URL    = `${SUPABASE_URL}/auth/v1`;
+  const API_URL     = `${SUPABASE_URL}/rest/v1/todos`;
+  const REDIRECT_TO = 'https://mustafa-turkekul.github.io/todo-app';
+
+  let session = null;
+  let todos   = [];
+  let filter  = 'all';
+  let mode    = 'login'; // 'login' | 'register'
+
+  // ── Helpers ──────────────────────────────────────────────────────────
+  function authHeaders() {
+    return {
+      'apikey': ANON_KEY,
+      'Authorization': `Bearer ${session.access_token}`,
       'Content-Type': 'application/json',
       'Prefer': 'return=representation'
     };
+  }
 
-    let todos = [];
-    let filter = 'all';
+  function saveSession(s) {
+    session = s;
+    localStorage.setItem('sb_session', JSON.stringify(s));
+  }
 
-    const input = document.getElementById('todo-input');
-    const list = document.getElementById('todo-list');
-    const countEl = document.getElementById('count');
+  function loadSession() {
+    try { return JSON.parse(localStorage.getItem('sb_session')); } catch { return null; }
+  }
 
-    input.addEventListener('keydown', e => { if (e.key === 'Enter') addTodo(); });
+  function clearSession() {
+    session = null;
+    localStorage.removeItem('sb_session');
+  }
 
-    async function loadTodos() {
-      setLoading(true);
-      const res = await fetch(`${API}?order=created_at.desc`, { headers: HEADERS });
-      todos = await res.json();
-      render();
-      setLoading(false);
-    }
+  function esc(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
 
-    async function addTodo() {
-      const text = input.value.trim();
-      if (!text) return;
-      input.value = '';
-      const res = await fetch(API, {
-        method: 'POST',
-        headers: HEADERS,
-        body: JSON.stringify({ text, done: false })
-      });
-      const [newTodo] = await res.json();
-      todos.unshift(newTodo);
-      render();
-    }
+  // ── UI State ─────────────────────────────────────────────────────────
+  function showAuth()    {
+    document.getElementById('confirm-section').style.display = 'none';
+    document.getElementById('auth-section').style.display = 'block';
+    document.getElementById('app-section').style.display  = 'none';
+  }
 
-    function startEdit(id) {
-      const li = document.querySelector(`li[data-id="${id}"]`);
-      const todo = todos.find(t => t.id === id);
-      li.innerHTML = `
-        <input class="edit-input" value="${esc(todo.text)}" maxlength="200" onkeydown="handleEditKey(event, ${id})">
-        <button class="save-btn" onclick="saveEdit(${id})">Kaydet</button>
-        <button class="cancel-btn" onclick="render()">&#x2715;</button>
-      `;
-      li.querySelector('.edit-input').focus();
-    }
-
-    function handleEditKey(e, id) {
-      if (e.key === 'Enter') saveEdit(id);
-      if (e.key === 'Escape') render();
-    }
-
-    async function saveEdit(id) {
-      const li = document.querySelector(`li[data-id="${id}"]`);
-      const newText = li.querySelector('.edit-input').value.trim();
-      if (!newText) return;
-      await fetch(`${API}?id=eq.${id}`, {
-        method: 'PATCH',
-        headers: HEADERS,
-        body: JSON.stringify({ text: newText })
-      });
-      todos.find(t => t.id === id).text = newText;
-      render();
-    }
-
-    async function toggleTodo(id) {
-      const todo = todos.find(t => t.id === id);
-      const newDone = !todo.done;
-      await fetch(`${API}?id=eq.${id}`, {
-        method: 'PATCH',
-        headers: HEADERS,
-        body: JSON.stringify({ done: newDone })
-      });
-      todo.done = newDone;
-      render();
-    }
-
-    async function deleteTodo(id) {
-      await fetch(`${API}?id=eq.${id}`, { method: 'DELETE', headers: HEADERS });
-      todos = todos.filter(t => t.id !== id);
-      render();
-    }
-
-    async function clearDone() {
-      const doneIds = todos.filter(t => t.done).map(t => t.id);
-      if (!doneIds.length) return;
-      await fetch(`${API}?id=in.(${doneIds.join(',')})`, { method: 'DELETE', headers: HEADERS });
-      todos = todos.filter(t => !t.done);
-      render();
-    }
-
-    function setFilter(f, btn) {
-      filter = f;
-      document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      render();
-    }
-
-    function setLoading(on) {
-      list.innerHTML = on ? '<li class="empty">Yükleniyor...</li>' : '';
-    }
-
-    function render() {
-      const visible = todos.filter(t =>
-        filter === 'all' ? true : filter === 'done' ? t.done : !t.done
-      );
-
-      if (visible.length === 0) {
-        list.innerHTML = '<li class="empty">Görev yok</li>';
-      } else {
-        list.innerHTML = visible.map(t => `
-          <li class="${t.done ? 'done' : ''}" data-id="${t.id}">
-            <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTodo(${t.id})">
-            <span class="todo-text">${esc(t.text)}</span>
-            <button class="edit-btn" onclick="startEdit(${t.id})" title="Düzenle">&#x270E;</button>
-            <button class="delete-btn" onclick="deleteTodo(${t.id})" title="Sil">&#x2715;</button>
-          </li>
-        `).join('');
-      }
-
-      const active = todos.filter(t => !t.done).length;
-      countEl.textContent = `${active} görev kaldı`;
-    }
-
-    function esc(str) {
-      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
+  function showApp()     {
+    document.getElementById('confirm-section').style.display = 'none';
+    document.getElementById('auth-section').style.display = 'none';
+    document.getElementById('app-section').style.display  = 'block';
+    document.getElementById('user-email-label').textContent = session.user.email;
+    document.getElementById('todo-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addTodo();
+    });
     loadTodos();
-  </script>
+  }
+
+  function showConfirm() {
+    document.getElementById('confirm-section').style.display = 'block';
+    document.getElementById('auth-section').style.display    = 'none';
+    document.getElementById('app-section').style.display     = 'none';
+  }
+
+  function setMsg(text, type) {
+    const el = document.getElementById('auth-msg');
+    el.textContent  = text;
+    el.className    = `msg ${type}`;
+  }
+
+  function switchTab(tab) {
+    mode = tab;
+    document.querySelectorAll('.auth-tab').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('auth-btn').textContent = tab === 'login' ? 'Giriş Yap' : 'Kayıt Ol';
+    document.getElementById('auth-msg').className = 'msg';
+  }
+
+  // ── Auth ─────────────────────────────────────────────────────────────
+  async function handleAuth() {
+    const email    = document.getElementById('auth-email').value.trim();
+    const password = document.getElementById('auth-password').value;
+    const btn      = document.getElementById('auth-btn');
+
+    if (!email || !password) return setMsg('E-posta ve şifre gerekli.', 'error');
+
+    btn.disabled = true;
+    btn.textContent = 'Lütfen bekleyin...';
+
+    if (mode === 'register') {
+      await signUp(email, password);
+    } else {
+      await signIn(email, password);
+    }
+
+    btn.disabled = false;
+    btn.textContent = mode === 'login' ? 'Giriş Yap' : 'Kayıt Ol';
+  }
+
+  async function signUp(email, password) {
+    const res  = await fetch(`${AUTH_URL}/signup`, {
+      method: 'POST',
+      headers: { 'apikey': ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, options: { emailRedirectTo: REDIRECT_TO } })
+    });
+    const data = await res.json();
+
+    if (!res.ok) return setMsg(data.msg || data.message || 'Kayıt başarısız.', 'error');
+
+    // identities boşsa zaten kayıtlı
+    if (data.identities && data.identities.length === 0) {
+      return setMsg('Bu e-posta zaten kayıtlı.', 'error');
+    }
+
+    setMsg('Kayıt başarılı! Lütfen e-posta kutunuzu kontrol edin ve onay bağlantısına tıklayın.', 'success');
+  }
+
+  async function signIn(email, password) {
+    const res  = await fetch(`${AUTH_URL}/token?grant_type=password`, {
+      method: 'POST',
+      headers: { 'apikey': ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      const msg = data.error_description || data.msg || 'Giriş başarısız.';
+      if (msg.toLowerCase().includes('email not confirmed')) {
+        return setMsg('E-posta adresiniz henüz onaylanmamış. Lütfen gelen kutunuzu kontrol edin.', 'error');
+      }
+      return setMsg('E-posta veya şifre hatalı.', 'error');
+    }
+
+    saveSession(data);
+    showApp();
+  }
+
+  async function signOut() {
+    await fetch(`${AUTH_URL}/logout`, {
+      method: 'POST',
+      headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${session.access_token}` }
+    });
+    clearSession();
+    todos = [];
+    showAuth();
+  }
+
+  // ── Handle email confirmation redirect (hash contains tokens) ─────────
+  async function handleHashTokens() {
+    const hash   = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    const type   = params.get('type');
+    const token  = params.get('access_token');
+    const refresh = params.get('refresh_token');
+
+    if (!token) return false;
+
+    // Clean the URL hash
+    history.replaceState(null, '', window.location.pathname);
+
+    if (type === 'signup' || type === 'magiclink') {
+      showConfirm();
+      // Small delay so user sees the confirmation screen
+      await new Promise(r => setTimeout(r, 1500));
+
+      // Fetch user info with the access token
+      const res  = await fetch(`${AUTH_URL}/user`, {
+        headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${token}` }
+      });
+      const user = await res.json();
+
+      saveSession({ access_token: token, refresh_token: refresh, user });
+      showApp();
+      return true;
+    }
+
+    return false;
+  }
+
+  // ── Todos ─────────────────────────────────────────────────────────────
+  async function loadTodos() {
+    renderList([]);
+    document.getElementById('todo-list').innerHTML = '<li class="empty">Yükleniyor...</li>';
+    const res = await fetch(`${API_URL}?order=created_at.desc`, { headers: authHeaders() });
+    if (!res.ok) return;
+    todos = await res.json();
+    render();
+  }
+
+  async function addTodo() {
+    const input = document.getElementById('todo-input');
+    const text  = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ text, done: false, user_id: session.user.id })
+    });
+    const [newTodo] = await res.json();
+    todos.unshift(newTodo);
+    render();
+  }
+
+  function startEdit(id) {
+    const li   = document.querySelector(`li[data-id="${id}"]`);
+    const todo = todos.find(t => t.id === id);
+    li.innerHTML = `
+      <input class="edit-input" value="${esc(todo.text)}" maxlength="200" onkeydown="handleEditKey(event,${id})">
+      <button class="save-btn" onclick="saveEdit(${id})">Kaydet</button>
+      <button class="cancel-btn" onclick="render()">&#x2715;</button>
+    `;
+    li.querySelector('.edit-input').focus();
+  }
+
+  function handleEditKey(e, id) {
+    if (e.key === 'Enter')  saveEdit(id);
+    if (e.key === 'Escape') render();
+  }
+
+  async function saveEdit(id) {
+    const li      = document.querySelector(`li[data-id="${id}"]`);
+    const newText = li.querySelector('.edit-input').value.trim();
+    if (!newText) return;
+    await fetch(`${API_URL}?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: authHeaders(),
+      body: JSON.stringify({ text: newText })
+    });
+    todos.find(t => t.id === id).text = newText;
+    render();
+  }
+
+  async function toggleTodo(id) {
+    const todo   = todos.find(t => t.id === id);
+    const newDone = !todo.done;
+    await fetch(`${API_URL}?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: authHeaders(),
+      body: JSON.stringify({ done: newDone })
+    });
+    todo.done = newDone;
+    render();
+  }
+
+  async function deleteTodo(id) {
+    await fetch(`${API_URL}?id=eq.${id}`, { method: 'DELETE', headers: authHeaders() });
+    todos = todos.filter(t => t.id !== id);
+    render();
+  }
+
+  async function clearDone() {
+    const ids = todos.filter(t => t.done).map(t => t.id);
+    if (!ids.length) return;
+    await fetch(`${API_URL}?id=in.(${ids.join(',')})`, { method: 'DELETE', headers: authHeaders() });
+    todos = todos.filter(t => !t.done);
+    render();
+  }
+
+  function setFilter(f, btn) {
+    filter = f;
+    document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  }
+
+  function renderList(visible) {
+    const list = document.getElementById('todo-list');
+    if (visible.length === 0) {
+      list.innerHTML = '<li class="empty">Görev yok</li>';
+    } else {
+      list.innerHTML = visible.map(t => `
+        <li class="${t.done ? 'done' : ''}" data-id="${t.id}">
+          <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTodo(${t.id})">
+          <span class="todo-text">${esc(t.text)}</span>
+          <button class="edit-btn" onclick="startEdit(${t.id})" title="Düzenle">&#x270E;</button>
+          <button class="delete-btn" onclick="deleteTodo(${t.id})" title="Sil">&#x2715;</button>
+        </li>
+      `).join('');
+    }
+  }
+
+  function render() {
+    const visible = todos.filter(t =>
+      filter === 'all' ? true : filter === 'done' ? t.done : !t.done
+    );
+    renderList(visible);
+    const active = todos.filter(t => !t.done).length;
+    document.getElementById('count').textContent = `${active} görev kaldı`;
+  }
+
+  // ── Boot ──────────────────────────────────────────────────────────────
+  async function boot() {
+    // 1. Check if this is a redirect from confirmation email
+    const handledHash = await handleHashTokens();
+    if (handledHash) return;
+
+    // 2. Check existing session in localStorage
+    const stored = loadSession();
+    if (stored && stored.access_token) {
+      // Verify token is still valid
+      const res = await fetch(`${AUTH_URL}/user`, {
+        headers: { 'apikey': ANON_KEY, 'Authorization': `Bearer ${stored.access_token}` }
+      });
+      if (res.ok) {
+        const user = await res.json();
+        stored.user = user;
+        saveSession(stored);
+        showApp();
+        return;
+      }
+    }
+
+    clearSession();
+    showAuth();
+  }
+
+  boot();
+</script>
 </body>
 </html>
