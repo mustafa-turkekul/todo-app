@@ -381,7 +381,7 @@
     const res  = await fetch(`${AUTH_URL}/signup`, {
       method: 'POST',
       headers: { 'apikey': ANON_KEY, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, options: { emailRedirectTo: REDIRECT_TO } })
+      body: JSON.stringify({ email, password, email_redirect_to: REDIRECT_TO })
     });
     const data = await res.json();
 
