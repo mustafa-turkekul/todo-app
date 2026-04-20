@@ -248,7 +248,17 @@
   </div>
 
   <script>
-    let todos = JSON.parse(localStorage.getItem('todos') || '[]');
+    const SUPABASE_URL = 'https://jswhjwegbvefaukbfdnn.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impzd2hqd2VnYnZlZmF1a2JmZG5uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MDkxMTgsImV4cCI6MjA5MjI4NTExOH0.JK_h5KdqLM_CnZXig7pcJswK1rO_SMtS72xw3eF09tI';
+    const API = `${SUPABASE_URL}/rest/v1/todos`;
+    const HEADERS = {
+      'apikey': SUPABASE_KEY,
+      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    };
+
+    let todos = [];
     let filter = 'all';
 
     const input = document.getElementById('todo-input');
@@ -257,16 +267,25 @@
 
     input.addEventListener('keydown', e => { if (e.key === 'Enter') addTodo(); });
 
-    function save() {
-      localStorage.setItem('todos', JSON.stringify(todos));
+    async function loadTodos() {
+      setLoading(true);
+      const res = await fetch(`${API}?order=created_at.desc`, { headers: HEADERS });
+      todos = await res.json();
+      render();
+      setLoading(false);
     }
 
-    function addTodo() {
+    async function addTodo() {
       const text = input.value.trim();
       if (!text) return;
-      todos.unshift({ id: Date.now(), text, done: false });
       input.value = '';
-      save();
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: HEADERS,
+        body: JSON.stringify({ text, done: false })
+      });
+      const [newTodo] = await res.json();
+      todos.unshift(newTodo);
       render();
     }
 
@@ -274,7 +293,7 @@
       const li = document.querySelector(`li[data-id="${id}"]`);
       const todo = todos.find(t => t.id === id);
       li.innerHTML = `
-        <input class="edit-input" value="${escape(todo.text)}" maxlength="200" onkeydown="handleEditKey(event, ${id})">
+        <input class="edit-input" value="${esc(todo.text)}" maxlength="200" onkeydown="handleEditKey(event, ${id})">
         <button class="save-btn" onclick="saveEdit(${id})">Kaydet</button>
         <button class="cancel-btn" onclick="render()">&#x2715;</button>
       `;
@@ -286,32 +305,42 @@
       if (e.key === 'Escape') render();
     }
 
-    function saveEdit(id) {
+    async function saveEdit(id) {
       const li = document.querySelector(`li[data-id="${id}"]`);
       const newText = li.querySelector('.edit-input').value.trim();
       if (!newText) return;
-      const todo = todos.find(t => t.id === id);
-      todo.text = newText;
-      save();
+      await fetch(`${API}?id=eq.${id}`, {
+        method: 'PATCH',
+        headers: HEADERS,
+        body: JSON.stringify({ text: newText })
+      });
+      todos.find(t => t.id === id).text = newText;
       render();
     }
 
-    function toggleTodo(id) {
+    async function toggleTodo(id) {
       const todo = todos.find(t => t.id === id);
-      if (todo) todo.done = !todo.done;
-      save();
+      const newDone = !todo.done;
+      await fetch(`${API}?id=eq.${id}`, {
+        method: 'PATCH',
+        headers: HEADERS,
+        body: JSON.stringify({ done: newDone })
+      });
+      todo.done = newDone;
       render();
     }
 
-    function deleteTodo(id) {
+    async function deleteTodo(id) {
+      await fetch(`${API}?id=eq.${id}`, { method: 'DELETE', headers: HEADERS });
       todos = todos.filter(t => t.id !== id);
-      save();
       render();
     }
 
-    function clearDone() {
+    async function clearDone() {
+      const doneIds = todos.filter(t => t.done).map(t => t.id);
+      if (!doneIds.length) return;
+      await fetch(`${API}?id=in.(${doneIds.join(',')})`, { method: 'DELETE', headers: HEADERS });
       todos = todos.filter(t => !t.done);
-      save();
       render();
     }
 
@@ -320,6 +349,10 @@
       document.querySelectorAll('.filters button').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       render();
+    }
+
+    function setLoading(on) {
+      list.innerHTML = on ? '<li class="empty">Yükleniyor...</li>' : '';
     }
 
     function render() {
@@ -333,7 +366,7 @@
         list.innerHTML = visible.map(t => `
           <li class="${t.done ? 'done' : ''}" data-id="${t.id}">
             <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTodo(${t.id})">
-            <span class="todo-text">${escape(t.text)}</span>
+            <span class="todo-text">${esc(t.text)}</span>
             <button class="edit-btn" onclick="startEdit(${t.id})" title="Düzenle">&#x270E;</button>
             <button class="delete-btn" onclick="deleteTodo(${t.id})" title="Sil">&#x2715;</button>
           </li>
@@ -344,11 +377,11 @@
       countEl.textContent = `${active} görev kaldı`;
     }
 
-    function escape(str) {
+    function esc(str) {
       return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    render();
+    loadTodos();
   </script>
 </body>
 </html>
